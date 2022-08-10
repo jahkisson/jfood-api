@@ -9,5 +9,5 @@ public interface CuisineRepository {
 	List<Cuisine> list();
 	Cuisine find(Long id);
 	Cuisine persist(Cuisine cuisine);
-	void remove(Cuisine cuisine);
+	void remove(Long id);
 }
