@@ -1,6 +1,7 @@
 package com.jackson.jfood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,12 +33,15 @@ public class StateController {
 	
 	@GetMapping
 	public List<State> listar() {
-		return stateRepository.list();
+		return stateRepository.findAll();
 	}
 	
 	@GetMapping("/{stateId}")
-	public State getById(@PathVariable("stateId") Long id) {
-		return stateRepository.find(id);
+	public ResponseEntity<State> getById(@PathVariable("stateId") Long id) {
+		Optional<State> state = stateRepository.findById(id);
+		if (state.isPresent())
+			return ResponseEntity.ok(state.get());
+		return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping
@@ -58,7 +62,7 @@ public class StateController {
 	}
 	
 	@DeleteMapping("/{stateId}")
-	public ResponseEntity<State> update(@PathVariable("stateId") Long id) {
+	public ResponseEntity<State> remove(@PathVariable("stateId") Long id) {
 		try {
 			stateRegistration.remove(id);
 			return ResponseEntity.noContent().build();

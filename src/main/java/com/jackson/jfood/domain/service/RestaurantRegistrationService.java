@@ -24,21 +24,20 @@ public class RestaurantRegistrationService {
 		restaurant = copyUpdatePropertiesIfNeeded(restaurant);
 		
 		Long cuisineId = restaurant.getCuisine().getId();
-		Cuisine cuisine = cuisineRepository.find(cuisineId);
-		if (cuisine == null)
-			throw new ReferencedEntityNotFoundException(String.format("Não existe cadastro de cozinha com o código %d", cuisineId));
+		Cuisine cuisine = cuisineRepository.findById(cuisineId)
+				.orElseThrow(() -> new ReferencedEntityNotFoundException(String.format("Não existe cadastro de cozinha com o código %d", cuisineId)));
 		
 		restaurant.setCuisine(cuisine);
-		return restaurantRepository.persist(restaurant);
+		return restaurantRepository.save(restaurant);
 	}
 	
 	private Restaurant copyUpdatePropertiesIfNeeded(Restaurant restaurant) {
 		if (restaurant.getId() == null || restaurant.getId() <= 0)
 			return restaurant;
 		
-		Restaurant restaurantToPersist = restaurantRepository.find(restaurant.getId());
-		if (restaurantToPersist == null)
-			throw new EntityNotFoundException(String.format("O restaurante com o código %d não foi encontrado", restaurant.getId()));
+		Restaurant restaurantToPersist = restaurantRepository.findById(restaurant.getId())
+				.orElseThrow(() -> new EntityNotFoundException(String.format("O restaurante com o código %d não foi encontrado", restaurant.getId())));
+		
 		BeanUtils.copyProperties(restaurant, restaurantToPersist, "id");
 		return restaurantToPersist;
 	}

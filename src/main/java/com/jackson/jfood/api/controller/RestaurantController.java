@@ -3,6 +3,7 @@ package com.jackson.jfood.api.controller;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,14 +37,14 @@ public class RestaurantController {
 	
 	@GetMapping
 	public List<Restaurant> listar() {
-		return restaurantRepository.list();
+		return restaurantRepository.findAll();
 	}
 	
 	@GetMapping("/{restaurantId}")
 	public ResponseEntity<Restaurant> getById(@PathVariable Long restaurantId) {
-		Restaurant restaurant = restaurantRepository.find(restaurantId);
-		if (restaurant != null)
-			return ResponseEntity.ok(restaurant);
+		Optional<Restaurant> restaurant = restaurantRepository.findById(restaurantId);
+		if (restaurant.isPresent())
+			return ResponseEntity.ok(restaurant.get());
 		return ResponseEntity.notFound().build();
 	}
 	
@@ -72,7 +73,7 @@ public class RestaurantController {
 	
 	@PatchMapping("/{restaurantId}")
 	public ResponseEntity<?> partialUpdate(@PathVariable Long restaurantId, @RequestBody Map<String, Object> fields) {
-		Restaurant oldRestaurant = restaurantRepository.find(restaurantId);
+		Restaurant oldRestaurant = restaurantRepository.findById(restaurantId).get();
 		merge(fields, oldRestaurant);
 		oldRestaurant.setId(restaurantId);
 		return update(restaurantId, oldRestaurant);

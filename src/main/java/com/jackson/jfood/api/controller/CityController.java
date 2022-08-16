@@ -1,6 +1,7 @@
 package com.jackson.jfood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,12 +34,16 @@ public class CityController {
 	
 	@GetMapping
 	public List<City> listar() {
-		return cityRepository.list();
+		return cityRepository.findAll();
 	}
 	
 	@GetMapping("/{cityId}")
-	public City getById(@PathVariable Long cityId) {
-		return cityRepository.find(cityId);
+	public ResponseEntity<City> getById(@PathVariable Long cityId) {
+		Optional<City> city = cityRepository.findById(cityId);
+		if (city.isEmpty())
+			return ResponseEntity.notFound().build();
+		
+		return ResponseEntity.ok(city.get());
 	}
 	
 	@PostMapping
@@ -65,7 +70,7 @@ public class CityController {
 	}
 	
 	@DeleteMapping("/{cityId}")
-	public ResponseEntity<State> update(@PathVariable Long cityId) {
+	public ResponseEntity<State> delete(@PathVariable Long cityId) {
 		try {
 			cityRegistration.remove(cityId);
 			return ResponseEntity.noContent().build();

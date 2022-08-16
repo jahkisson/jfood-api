@@ -19,12 +19,12 @@ public class StateRegistrationService {
 	
 	public State save(State state) {
 		state = copyUpdatePropertiesIfNeeded(state);
-		return stateRepository.persist(state);
+		return stateRepository.save(state);
 	}
 	
 	public void remove(Long id) {
 		try {
-			stateRepository.remove(id);
+			stateRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException ex) {
 			throw new EntityNotFoundException(String.format("Estado de código %d não encontrado", id));
 		} catch (DataIntegrityViolationException ex) {
@@ -36,9 +36,8 @@ public class StateRegistrationService {
 		if (state.getId() == null || state.getId() <= 0)
 			return state;
 		
-		State stateToPersist = stateRepository.find(state.getId());
-		if (stateToPersist == null)
-			throw new EntityNotFoundException(String.format("O estado de código %d não foi encontrado", state.getId()));
+		State stateToPersist = stateRepository.findById(state.getId())
+				.orElseThrow(() -> new EntityNotFoundException(String.format("O estado de código %d não foi encontrado", state.getId())));
 		
 		BeanUtils.copyProperties(state, stateToPersist, "id");
 		return stateToPersist;

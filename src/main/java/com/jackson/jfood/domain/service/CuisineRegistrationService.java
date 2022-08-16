@@ -17,12 +17,12 @@ public class CuisineRegistrationService {
 	private CuisineRepository cuisineRepository;
 	
 	public Cuisine save(Cuisine cuisine) {
-		return cuisineRepository.persist(cuisine);
+		return cuisineRepository.save(cuisine);
 	}
 	
 	public void remove(Long cuisineId) {
 		try {
-			cuisineRepository.remove(cuisineId);
+			cuisineRepository.deleteById(cuisineId);
 		} catch (EmptyResultDataAccessException ex) {
 			throw new EntityNotFoundException(String.format("Cozinha de código %d não encontrada", cuisineId));
 		} catch (DataIntegrityViolationException ex) {

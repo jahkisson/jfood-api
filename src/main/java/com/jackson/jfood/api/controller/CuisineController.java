@@ -1,6 +1,7 @@
 package com.jackson.jfood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +36,14 @@ public class CuisineController {
 	
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 	public List<Cuisine> listar() {
-		return cuisineRepository.list();
+		return cuisineRepository.findAll();
 	}
 	
 	@GetMapping("/{cuisineId}")
 	public ResponseEntity<Cuisine> getById(@PathVariable Long cuisineId) {
-		Cuisine cuisine = cuisineRepository.find(cuisineId);
-		if (cuisine != null)
-			return ResponseEntity.ok(cuisine);
+		Optional<Cuisine> cuisine = cuisineRepository.findById(cuisineId);
+		if (cuisine.isPresent())
+			return ResponseEntity.ok(cuisine.get());
 		return ResponseEntity.notFound().build();
 	}
 	
@@ -54,12 +55,12 @@ public class CuisineController {
 	
 	@PutMapping("/{cuisineId}")
 	public ResponseEntity<Cuisine> update(@PathVariable Long cuisineId, @RequestBody Cuisine cuisine) {
-		Cuisine cuisineToUpdate = cuisineRepository.find(cuisineId);
-		if (cuisineToUpdate == null)
+		Optional<Cuisine> cuisineToUpdate = cuisineRepository.findById(cuisineId);
+		if (cuisineToUpdate.isEmpty())
 			return ResponseEntity.notFound().build();
-		BeanUtils.copyProperties(cuisine, cuisineToUpdate, "id");
-		cuisineRegistration.save(cuisineToUpdate);
-		return ResponseEntity.ok(cuisineToUpdate);
+		BeanUtils.copyProperties(cuisine, cuisineToUpdate.get(), "id");
+		cuisine = cuisineRegistration.save(cuisineToUpdate.get());
+		return ResponseEntity.ok(cuisine);
 	}
 	
 	@DeleteMapping("/{cuisineId}")
