@@ -38,7 +38,7 @@ public class RestaurantRegistrationService {
 		Restaurant restaurantToPersist = restaurantRepository.findById(restaurant.getId())
 				.orElseThrow(() -> new EntityNotFoundException(String.format("O restaurante com o código %d não foi encontrado", restaurant.getId())));
 		
-		BeanUtils.copyProperties(restaurant, restaurantToPersist, "id");
+		BeanUtils.copyProperties(restaurant, restaurantToPersist, "id", "paymentTypes", "address", "creationTimestamp", "products");
 		return restaurantToPersist;
 	}
 }
