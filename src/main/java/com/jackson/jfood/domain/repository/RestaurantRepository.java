@@ -14,7 +14,7 @@ import com.jackson.jfood.domain.model.Restaurant;
 @Repository
 public interface RestaurantRepository extends CustomJpaRepository<Restaurant, Long>, RestaurantRepositoryQueries, JpaSpecificationExecutor<Restaurant> {
 
-	@Query("from Restaurant r join fetch r.cuisine left join fetch r.paymentTypes")
+	@Query("from Restaurant r join fetch r.cuisine")
 	List<Restaurant> findAll();
 	
 	List<Restaurant> findByShippingFeeBetween(BigDecimal start, BigDecimal end);
