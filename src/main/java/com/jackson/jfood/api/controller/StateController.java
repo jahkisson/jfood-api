@@ -1,11 +1,10 @@
 package com.jackson.jfood.api.controller;
 
 import java.util.List;
-import java.util.Optional;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,10 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jackson.jfood.domain.exception.EntityIsBeingUsedException;
-import com.jackson.jfood.domain.exception.EntityNotFoundException;
 import com.jackson.jfood.domain.model.State;
 import com.jackson.jfood.domain.repository.StateRepository;
 import com.jackson.jfood.domain.service.StateRegistrationService;
@@ -37,39 +35,26 @@ public class StateController {
 	}
 	
 	@GetMapping("/{stateId}")
-	public ResponseEntity<State> getById(@PathVariable("stateId") Long id) {
-		Optional<State> state = stateRepository.findById(id);
-		if (state.isPresent())
-			return ResponseEntity.ok(state.get());
-		return ResponseEntity.notFound().build();
+	public State getById(@PathVariable("stateId") Long id) {
+		return stateRegistration.findByIdOrFail(id);
 	}
 	
 	@PostMapping
-	public ResponseEntity<State> add(@RequestBody State state) {
-		state = stateRegistration.save(state);
-		return ResponseEntity.status(HttpStatus.CREATED).body(state);
+	@ResponseStatus(HttpStatus.CREATED)
+	public State add(@RequestBody State state) {
+		return stateRegistration.save(state);
 	}
 	
 	@PutMapping("/{stateId}")
-	public ResponseEntity<State> update(@PathVariable("stateId") Long id, @RequestBody State state) {
-		try {
-			state.setId(id);
-			state = stateRegistration.save(state);
-			return ResponseEntity.ok(state);
-		} catch (EntityNotFoundException e) {
-			return ResponseEntity.notFound().build();
-		}
+	public State update(@PathVariable("stateId") Long id, @RequestBody State state) {
+		State stateToUpdate = stateRegistration.findByIdOrFail(id);
+		BeanUtils.copyProperties(state, stateToUpdate, "id");
+		return stateRegistration.save(state);
 	}
 	
 	@DeleteMapping("/{stateId}")
-	public ResponseEntity<State> remove(@PathVariable("stateId") Long id) {
-		try {
-			stateRegistration.remove(id);
-			return ResponseEntity.noContent().build();
-		} catch (EntityNotFoundException e) {
-			return ResponseEntity.notFound().build();
-		} catch (EntityIsBeingUsedException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		}
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void remove(@PathVariable("stateId") Long id) {
+		stateRegistration.remove(id);
 	}
 }

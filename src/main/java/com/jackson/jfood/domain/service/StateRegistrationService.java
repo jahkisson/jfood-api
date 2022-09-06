@@ -7,15 +7,22 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import com.jackson.jfood.domain.exception.EntityIsBeingUsedException;
-import com.jackson.jfood.domain.exception.EntityNotFoundException;
+import com.jackson.jfood.domain.exception.StateNotFoundException;
 import com.jackson.jfood.domain.model.State;
 import com.jackson.jfood.domain.repository.StateRepository;
 
 @Service
 public class StateRegistrationService {
 
+	private static final String MESSAGE_STATE_IN_USE = "Estado de código %d não pode ser removido pois está em uso";
+	
 	@Autowired
 	private StateRepository stateRepository;
+	
+	public State findByIdOrFail(Long stateId) {
+		return stateRepository.findById(stateId)
+				.orElseThrow(() -> new StateNotFoundException(stateId));
+	}
 	
 	public State save(State state) {
 		state = copyUpdatePropertiesIfNeeded(state);
@@ -26,9 +33,9 @@ public class StateRegistrationService {
 		try {
 			stateRepository.deleteById(id);
 		} catch (EmptyResultDataAccessException ex) {
-			throw new EntityNotFoundException(String.format("Estado de código %d não encontrado", id));
+			throw new StateNotFoundException(id);
 		} catch (DataIntegrityViolationException ex) {
-			throw new EntityIsBeingUsedException(String.format("Estado de código %d não pode ser removido pois está em uso", id));
+			throw new EntityIsBeingUsedException(String.format(MESSAGE_STATE_IN_USE, id));
 		}
 	}
 
@@ -36,8 +43,7 @@ public class StateRegistrationService {
 		if (state.getId() == null || state.getId() <= 0)
 			return state;
 		
-		State stateToPersist = stateRepository.findById(state.getId())
-				.orElseThrow(() -> new EntityNotFoundException(String.format("O estado de código %d não foi encontrado", state.getId())));
+		State stateToPersist = findByIdOrFail(state.getId());
 		
 		BeanUtils.copyProperties(state, stateToPersist, "id");
 		return stateToPersist;

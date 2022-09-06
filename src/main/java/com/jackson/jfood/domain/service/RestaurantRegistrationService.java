@@ -1,14 +1,11 @@
 package com.jackson.jfood.domain.service;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jackson.jfood.domain.exception.EntityNotFoundException;
-import com.jackson.jfood.domain.exception.ReferencedEntityNotFoundException;
+import com.jackson.jfood.domain.exception.RestaurantNotFoundException;
 import com.jackson.jfood.domain.model.Cuisine;
 import com.jackson.jfood.domain.model.Restaurant;
-import com.jackson.jfood.domain.repository.CuisineRepository;
 import com.jackson.jfood.domain.repository.RestaurantRepository;
 
 @Service
@@ -18,27 +15,18 @@ public class RestaurantRegistrationService {
 	private RestaurantRepository restaurantRepository;
 	
 	@Autowired
-	private CuisineRepository cuisineRepository;
+	private CuisineRegistrationService cuisineRegistration;
+	
+	public Restaurant findByIdOrFail(Long restaurantId) {
+		return restaurantRepository.findById(restaurantId)
+				.orElseThrow(() -> new RestaurantNotFoundException(restaurantId));
+	}
 	
 	public Restaurant save(Restaurant restaurant) {
-		restaurant = copyUpdatePropertiesIfNeeded(restaurant);
-		
 		Long cuisineId = restaurant.getCuisine().getId();
-		Cuisine cuisine = cuisineRepository.findById(cuisineId)
-				.orElseThrow(() -> new ReferencedEntityNotFoundException(String.format("Não existe cadastro de cozinha com o código %d", cuisineId)));
+		Cuisine cuisine = cuisineRegistration.findByIdOrFail(cuisineId);
 		
 		restaurant.setCuisine(cuisine);
 		return restaurantRepository.save(restaurant);
-	}
-	
-	private Restaurant copyUpdatePropertiesIfNeeded(Restaurant restaurant) {
-		if (restaurant.getId() == null || restaurant.getId() <= 0)
-			return restaurant;
-		
-		Restaurant restaurantToPersist = restaurantRepository.findById(restaurant.getId())
-				.orElseThrow(() -> new EntityNotFoundException(String.format("O restaurante com o código %d não foi encontrado", restaurant.getId())));
-		
-		BeanUtils.copyProperties(restaurant, restaurantToPersist, "id", "paymentTypes", "address", "creationTimestamp", "products");
-		return restaurantToPersist;
 	}
 }
