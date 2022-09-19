@@ -2,6 +2,8 @@ package com.jackson.jfood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -41,12 +43,12 @@ public class StateController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public State add(@RequestBody State state) {
+	public State add(@RequestBody @Valid State state) {
 		return stateRegistration.save(state);
 	}
 	
 	@PutMapping("/{stateId}")
-	public State update(@PathVariable("stateId") Long id, @RequestBody State state) {
+	public State update(@PathVariable("stateId") Long id, @RequestBody @Valid State state) {
 		State stateToUpdate = stateRegistration.findByIdOrFail(id);
 		BeanUtils.copyProperties(state, stateToUpdate, "id");
 		return stateRegistration.save(state);

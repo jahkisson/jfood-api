@@ -2,6 +2,8 @@ package com.jackson.jfood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +45,7 @@ public class CityController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public City add(@RequestBody City city) {
+	public City add(@RequestBody @Valid City city) {
 		try {
 			return cityRegistration.save(city);
 		} catch (StateNotFoundException ex) {
@@ -52,7 +54,7 @@ public class CityController {
 	}
 	
 	@PutMapping("/{cityId}")
-	public City update(@PathVariable Long cityId, @RequestBody City city) {
+	public City update(@PathVariable Long cityId, @RequestBody @Valid City city) {
 		City cityToPersist = cityRegistration.findByIdOrFail(cityId);
 		BeanUtils.copyProperties(city, cityToPersist, "id");
 		try {

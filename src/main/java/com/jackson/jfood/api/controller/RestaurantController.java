@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jackson.jfood.core.validation.ValidationException;
 import com.jackson.jfood.domain.exception.BusinessException;
 import com.jackson.jfood.domain.exception.EntityNotFoundException;
 import com.jackson.jfood.domain.model.Restaurant;
@@ -41,6 +45,9 @@ public class RestaurantController {
 	@Autowired
 	private RestaurantRegistrationService restaurantRegistration;
 	
+	@Autowired
+	private SmartValidator validator;
+	
 	@GetMapping
 	public List<Restaurant> listar() {
 		return restaurantRepository.findAll();
@@ -53,7 +60,7 @@ public class RestaurantController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Restaurant add(@RequestBody Restaurant restaurant) {
+	public Restaurant add(@RequestBody @Valid Restaurant restaurant) {
 		try {
 			return restaurantRegistration.save(restaurant);
 		} catch (EntityNotFoundException ex) {
@@ -62,7 +69,7 @@ public class RestaurantController {
 	}
 	
 	@PutMapping("/{restaurantId}")
-	public Restaurant update(@PathVariable Long restaurantId, @RequestBody Restaurant restaurant) {
+	public Restaurant update(@PathVariable Long restaurantId, @RequestBody @Valid Restaurant restaurant) {
 		Restaurant restaurantToPersist = restaurantRegistration.findByIdOrFail(restaurantId);
 		BeanUtils.copyProperties(restaurant, restaurantToPersist, "id", "paymentTypes", "address", "creationTimestamp", "products");
 		try {
@@ -79,7 +86,16 @@ public class RestaurantController {
 		Restaurant oldRestaurant = restaurantRegistration.findByIdOrFail(restaurantId);
 		merge(fields, oldRestaurant, request);
 		oldRestaurant.setId(restaurantId);
+		validate(oldRestaurant, "restaurant");
 		return update(restaurantId, oldRestaurant);
+	}
+
+	private void validate(Restaurant restaurant, String objectName) {
+		BeanPropertyBindingResult bindindResult = new BeanPropertyBindingResult(restaurant, objectName);
+		validator.validate(restaurant, bindindResult);
+		if (bindindResult.hasErrors()) {
+			throw new ValidationException(bindindResult);
+		}
 	}
 
 	private void merge(Map<String, Object> fields, Restaurant restaurant, HttpServletRequest request) {

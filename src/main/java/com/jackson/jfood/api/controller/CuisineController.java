@@ -2,6 +2,8 @@ package com.jackson.jfood.api.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,12 +44,12 @@ public class CuisineController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public Cuisine add(@RequestBody Cuisine cuisine) {
+	public Cuisine add(@RequestBody @Valid Cuisine cuisine) {
 		return cuisineRegistration.save(cuisine);
 	}
 	
 	@PutMapping("/{cuisineId}")
-	public Cuisine update(@PathVariable Long cuisineId, @RequestBody Cuisine cuisine) {
+	public Cuisine update(@PathVariable Long cuisineId, @RequestBody @Valid Cuisine cuisine) {
 		Cuisine cuisineToUpdate = cuisineRegistration.findByIdOrFail(cuisineId);
 		BeanUtils.copyProperties(cuisine, cuisineToUpdate, "id");
 		return cuisineRegistration.save(cuisineToUpdate);

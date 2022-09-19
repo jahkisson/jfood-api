@@ -17,15 +17,25 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.groups.ConvertGroup;
+import javax.validation.groups.Default;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jackson.jfood.core.validation.Groups;
+import com.jackson.jfood.core.validation.ValueZeroIncludesDescription;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+@ValueZeroIncludesDescription(fieldValue = "shippingFee", 
+	fieldDescription = "name", mandatoryDescription = "Frete Grátis")
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
@@ -36,12 +46,23 @@ public class Restaurant {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	//@NotNull
+	//@NotEmpty
+	@NotBlank
 	@Column(nullable = false)
 	private String name;
-	
+
+	@NotNull
+	//@DecimalMin("0")
+	@PositiveOrZero
+	//@ShippingFee
+	//@Multiple(number = 5)
 	@Column(name="shipping_fee", nullable = false)
 	private BigDecimal shippingFee;
 	
+	@Valid
+	@ConvertGroup(from = Default.class, to = Groups.CuisineId.class)
+	@NotNull
 	//@JsonIgnore
 	//@JsonIgnoreProperties("hibernateLazyInitializer")
 	@ManyToOne//(fetch = FetchType.LAZY)

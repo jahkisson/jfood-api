@@ -9,6 +9,7 @@ public enum ApiErrorType {
 	BUSINESS_ERROR ("Erro de negócio", "/business-error"),
 	UNKOWN_PROPERTIES ("Propriedades desconhecidas", "/unknown-properties"),
 	INVALID_PARAMETER ("Parâmetro inválido", "/invalid-parameter"),
+	INVALID_DATA ("Dados Inválidos", "/invalid-data"),
 	SYSTEM_ERROR ("Erro de sistema", "/system-error"),
 	UNREADABLE_BODY ("Mensagem não compreensível", "/unreadable-body");
 	
