@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.jfood.domain.exception.CityNotFoundException;
 import com.jackson.jfood.domain.exception.EntityIsBeingUsedException;
@@ -27,6 +28,7 @@ public class CityRegistrationService {
 				.orElseThrow(() -> new CityNotFoundException(cityId));
 	}
 	
+	@Transactional
 	public City save(City city) {
 		Long stateId = city.getState().getId();
 		State state = stateRegistration.findByIdOrFail(stateId);
@@ -35,9 +37,11 @@ public class CityRegistrationService {
 		return cityRepository.save(city);
 	}
 	
+	@Transactional
 	public void remove(Long id) {
 		try {
 			cityRepository.deleteById(id);
+			cityRepository.flush();
 		} catch (EmptyResultDataAccessException e) {
 			throw new CityNotFoundException(id);
 		} catch (DataIntegrityViolationException ex) {

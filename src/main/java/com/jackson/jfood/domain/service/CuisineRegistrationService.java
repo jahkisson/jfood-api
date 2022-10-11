@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.jfood.domain.exception.CuisineNotFoundException;
 import com.jackson.jfood.domain.exception.EntityIsBeingUsedException;
@@ -23,13 +24,16 @@ public class CuisineRegistrationService {
 				.orElseThrow(() -> new CuisineNotFoundException(cuisineId));
 	}
 	
+	@Transactional
 	public Cuisine save(Cuisine cuisine) {
 		return cuisineRepository.save(cuisine);
 	}
 	
+	@Transactional
 	public void remove(Long cuisineId) {
 		try {
 			cuisineRepository.deleteById(cuisineId);
+			cuisineRepository.flush();
 		} catch (EmptyResultDataAccessException ex) {
 			throw new CuisineNotFoundException(cuisineId);
 		} catch (DataIntegrityViolationException ex) {

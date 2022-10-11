@@ -1,6 +1,6 @@
 package com.jackson.jfood.api.exceptionhandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -185,7 +185,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			body = ApiError.builder()
 					.status(status.value())
 					.title(message)
-					.timestamp(LocalDateTime.now())
+					.timestamp(OffsetDateTime.now())
 					.userMessage(MESSAGE_GENERIC_ERROR_USER_FRIENDLY)
 					.build();
 		}
@@ -202,6 +202,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 				.type(apiErrorType.getUri())
 				.title(apiErrorType.getTitle())
 				.detail(detail)
-				.timestamp(LocalDateTime.now());
+				.timestamp(OffsetDateTime.now());
 	}
 }

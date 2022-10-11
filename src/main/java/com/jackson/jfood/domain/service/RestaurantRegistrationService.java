@@ -2,6 +2,7 @@ package com.jackson.jfood.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.jfood.domain.exception.RestaurantNotFoundException;
 import com.jackson.jfood.domain.model.Cuisine;
@@ -22,6 +23,7 @@ public class RestaurantRegistrationService {
 				.orElseThrow(() -> new RestaurantNotFoundException(restaurantId));
 	}
 	
+	@Transactional
 	public Restaurant save(Restaurant restaurant) {
 		Long cuisineId = restaurant.getCuisine().getId();
 		Cuisine cuisine = cuisineRegistration.findByIdOrFail(cuisineId);

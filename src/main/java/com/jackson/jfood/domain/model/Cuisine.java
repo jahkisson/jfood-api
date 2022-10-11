@@ -12,7 +12,6 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import com.jackson.jfood.core.validation.Groups;
 
@@ -32,12 +31,9 @@ public class Cuisine {
 	private Long id;
 	
 	@NotBlank
-	//@JsonIgnore
-	//@JsonProperty("titulo")
 	@Column(nullable = false)
 	private String name;
 	
-	@JsonIgnore
 	@OneToMany(mappedBy = "cuisine")
 	private List<Restaurant> restaurants =  new ArrayList<>();
 }

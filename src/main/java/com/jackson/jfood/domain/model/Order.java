@@ -1,7 +1,7 @@
 package com.jackson.jfood.domain.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -42,16 +42,16 @@ public class Order {
 	
 	@CreationTimestamp
 	@Column(name = "creation_date", nullable = false)
-	private LocalDateTime creationDate;
+	private OffsetDateTime creationDate;
 	
 	@Column(name = "confirmation_date")
-	private LocalDateTime confirmationDate;
+	private OffsetDateTime confirmationDate;
 	
 	@Column(name = "cancel_date")
-	private LocalDateTime cancelDate;
+	private OffsetDateTime cancelDate;
 	
 	@Column(name = "delivery_date")
-	private LocalDateTime deliveryDate;
+	private OffsetDateTime deliveryDate;
 	
 	@Column(nullable = false)
 	private OrderStatus status;

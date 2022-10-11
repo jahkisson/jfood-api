@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jackson.jfood.domain.exception.EntityIsBeingUsedException;
 import com.jackson.jfood.domain.exception.StateNotFoundException;
@@ -24,14 +25,17 @@ public class StateRegistrationService {
 				.orElseThrow(() -> new StateNotFoundException(stateId));
 	}
 	
+	@Transactional
 	public State save(State state) {
 		state = copyUpdatePropertiesIfNeeded(state);
 		return stateRepository.save(state);
 	}
 	
+	@Transactional
 	public void remove(Long id) {
 		try {
 			stateRepository.deleteById(id);
+			stateRepository.flush();
 		} catch (EmptyResultDataAccessException ex) {
 			throw new StateNotFoundException(id);
 		} catch (DataIntegrityViolationException ex) {
