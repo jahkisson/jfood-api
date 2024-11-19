@@ -2,8 +2,8 @@ package com.jackson.jfood.domain.model;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -65,6 +65,10 @@ public class Restaurant {
 	@Embedded
 	private Address address;
 	
+	private Boolean active = true;
+	
+	private Boolean open = true;
+	
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
 	private OffsetDateTime creationTimestamp;
@@ -77,8 +81,46 @@ public class Restaurant {
 	@JoinTable(name="restaurant_payment_type", 
 				joinColumns = @JoinColumn(name = "restaurant_id"),
 				inverseJoinColumns = @JoinColumn(name = "payment_type_id"))
-	private List<PaymentType> paymentTypes = new ArrayList<>();
+	private Set<PaymentType> paymentTypes = new HashSet<PaymentType>();
 	
 	@OneToMany(mappedBy = "restaurant")
-	private List<Product> products = new ArrayList<>();
+	private Set<Product> products = new HashSet<Product>();
+	
+	@ManyToMany
+	@JoinTable(name = "restaurant_user_manager",
+			joinColumns = @JoinColumn(name = "restaurant_id"),
+			inverseJoinColumns = @JoinColumn(name = "user_id"))
+	private Set<User> managers = new HashSet<>();
+	
+	public void activate() {
+		setActive(true);
+	}
+	
+	public void deactivate() {
+		setActive(false);
+	}
+	
+	public void toOpen() {
+		setOpen(true);
+	}
+	
+	public void toClose() {
+		setOpen(false);
+	}
+	
+	public boolean addManager(User manager) {
+		return getManagers().add(manager);
+	}
+	
+	public boolean removeManager(User manager) {
+		return getManagers().remove(manager);
+	}
+	
+	public boolean acceptsPaymentType(PaymentType paymentType) {
+		return getPaymentTypes().contains(paymentType);
+	}
+	
+	public boolean notAcceptsPaymentType(PaymentType paymentType) {
+		return !acceptsPaymentType(paymentType);
+	}
 }

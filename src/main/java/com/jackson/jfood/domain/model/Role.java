@@ -1,7 +1,7 @@
 package com.jackson.jfood.domain.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,5 +32,13 @@ public class Role {
 	@JoinTable(name = "role_permission", 
 		joinColumns = @JoinColumn(name = "role_id"),
 		inverseJoinColumns = @JoinColumn(name = "permission_id"))
-	private List<Permission> permissions = new ArrayList<>();
+	private Set<Permission> permissions = new HashSet<Permission>();
+	
+	public boolean removePermission(Permission permission) {
+		return getPermissions().remove(permission);
+	}
+	
+	public boolean addPermission(Permission permission) {
+		return getPermissions().add(permission);
+	}
 }

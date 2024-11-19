@@ -5,6 +5,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import com.jackson.jfood.api.model.RestaurantModel;
 import com.jackson.jfood.api.model.input.RestaurantInput;
 import com.jackson.jfood.domain.exception.BusinessException;
 import com.jackson.jfood.domain.exception.EntityNotFoundException;
+import com.jackson.jfood.domain.exception.RestaurantNotFoundException;
 import com.jackson.jfood.domain.model.Restaurant;
 import com.jackson.jfood.domain.repository.RestaurantRepository;
 import com.jackson.jfood.domain.service.RestaurantRegistrationService;
@@ -71,5 +73,49 @@ public class RestaurantController {
 		} catch (EntityNotFoundException ex) {
 			throw new BusinessException(ex.getMessage());
 		}
+	}
+	
+	@PutMapping("/{restaurantId}/active")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void activate(@PathVariable Long restaurantId) {
+		restaurantRegistration.activate(restaurantId);
+	}
+	
+	@DeleteMapping("/{restaurantId}/active")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deactivate(@PathVariable Long restaurantId) {
+		restaurantRegistration.deactivate(restaurantId);
+	}
+	
+	@PutMapping("/{restaurantId}/opening")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void open(@PathVariable Long restaurantId) {
+		restaurantRegistration.open(restaurantId);
+	}
+	
+	@PutMapping("/activations")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void activateMany(@RequestBody List<Long> restaurantIds) {
+		try {
+			restaurantRegistration.activate(restaurantIds);
+		} catch (RestaurantNotFoundException e) {
+			throw new BusinessException(e.getMessage(), e);
+		}
+	}
+	
+	@DeleteMapping("/activations")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void deactivateMany(@RequestBody List<Long> restaurantIds) {
+		try {
+			restaurantRegistration.deactivate(restaurantIds);
+		} catch (RestaurantNotFoundException e) {
+			throw new BusinessException(e.getMessage(), e);
+		}
+	}
+	
+	@PutMapping("/{restaurantId}/closing")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void close(@PathVariable Long restaurantId) {
+		restaurantRegistration.close(restaurantId);
 	}
 }

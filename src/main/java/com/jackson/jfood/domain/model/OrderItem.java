@@ -47,4 +47,10 @@ public class OrderItem {
 	@ManyToOne
 	@JoinColumn(name="order_id", nullable = false)
 	private Order order;
+	
+	public void calculateTotalPrice() {
+		BigDecimal unitPrice = getUnitPrice() != null ? getUnitPrice() : BigDecimal.ZERO;
+		BigDecimal quantity = getQuantity() != null ? getQuantity() : BigDecimal.ZERO;
+		this.setTotalPrice(unitPrice.multiply(quantity));
+	}
 }

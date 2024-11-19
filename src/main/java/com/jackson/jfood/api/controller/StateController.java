@@ -41,7 +41,7 @@ public class StateController {
 	private StateInputDisassembler stateInputDisassembler;
 	
 	@GetMapping
-	public List<StateModel> listar() {
+	public List<StateModel> listAll() {
 		return stateModelAssembler.toCollectionModel(stateRepository.findAll());
 	}
 	

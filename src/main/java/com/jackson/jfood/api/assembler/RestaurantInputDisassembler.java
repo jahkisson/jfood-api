@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jackson.jfood.api.model.input.RestaurantInput;
+import com.jackson.jfood.domain.model.City;
 import com.jackson.jfood.domain.model.Cuisine;
 import com.jackson.jfood.domain.model.Restaurant;
 
@@ -25,5 +26,9 @@ public class RestaurantInputDisassembler {
 
 	private void avoidHibernateExceptionIdChange(Restaurant restaurant) {
 		restaurant.setCuisine(new Cuisine());
+		
+		if (restaurant.getAddress() != null) {
+			restaurant.getAddress().setCity(new City());
+		}
 	}
 }
